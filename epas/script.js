@@ -5,7 +5,7 @@ let geoJsonTemplate = {};
 // Load validation files on page load
 window.addEventListener('DOMContentLoaded', async () => {
     // Load NUTS3 values
-    const nutsResponse = await fetch('assets/Nuts3ValuesLocation.xlsx');
+    const nutsResponse = await fetch('assets/SsuEpasSchoolsFile.xlsx');
     const nutsBuffer = await nutsResponse.arrayBuffer();
     const nutsWorkbook = XLSX.read(nutsBuffer);
     nuts3List = XLSX.utils.sheet_to_json(nutsWorkbook.Sheets[nutsWorkbook.SheetNames[0]], { header: 1 }).flat();
@@ -118,7 +118,7 @@ function setupGeoJsonDownload(geoJson) {
 
 // Template Downloads (pre-bundled files)
 document.getElementById('download-schools').addEventListener('click', () => {
-    window.location.href = 'assets/SsuEpasSchoolsFile.xlsx';
+    window.location.href = 'assets/Nuts3ValuesLocation.xlsx';
 });
 
 document.getElementById('download-geojson').addEventListener('click', () => {
