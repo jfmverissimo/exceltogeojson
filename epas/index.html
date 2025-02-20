@@ -2,31 +2,244 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EPAS Data Processor (Client-Side)</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Include SheetJS for Excel processing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPAS Data Processor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --error-color: #e74c3c;
+            --warning-color: #f1c40f;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem 0;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        .header h1 {
+            color: var(--secondary-color);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar {
+            border-right: 2px solid #eee;
+            padding-right: 2rem;
+        }
+
+        .main-content {
+            min-height: 500px;
+        }
+
+        .card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        button i {
+            font-size: 1.2rem;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover {
+            border-color: var(--secondary-color);
+            background-color: #f8fbff;
+        }
+
+        #file-upload {
+            display: none;
+        }
+
+        .status {
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .status.success {
+            background-color: #e8f6ef;
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+        }
+
+        .status.error {
+            background-color: #fdeded;
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+        }
+
+        .duplicates-section {
+            margin: 2rem 0;
+        }
+
+        .duplicate-group {
+            margin: 1rem 0;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .duplicate-header {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .duplicate-content {
+            padding: 1rem;
+            background-color: white;
+            display: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                padding-right: 0;
+                border-bottom: 2px solid #eee;
+                padding-bottom: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Efrem's EPAS Data Processor</h1>
-        
-        <!-- Download Templates -->
-        <div class="downloads">
-            <button id="download-schools">📥 Schools Template</button>
-            <button id="download-geojson">📥 NUTS GeoJSON</button>
+        <div class="header">
+            <h1>EPAS Data Processor</h1>
+            <p>Validate school data and generate GeoJSON files</p>
         </div>
 
-        <!-- File Upload -->
-        <input type="file" id="file-upload" accept=".xlsx">
-        <div id="status"></div>
+        <div class="dashboard">
+            <div class="sidebar">
+                <div class="card">
+                    <h3>Assets</h3>
+                    <button id="download-schools">
+                        <i class="fas fa-file-excel"></i>
+                        Schools Template
+                    </button>
+                    <button id="download-geojson">
+                        <i class="fas fa-map-marked-alt"></i>
+                        GeoJSON Template
+                    </button>
+                </div>
+            </div>
 
-        <!-- Results -->
-        <div id="duplicates"></div>
-        <div id="download-output" style="display: none;">
-            <button id="download-btn">Download GeoJSON</button>
+            <div class="main-content">
+                <div class="card">
+                    <div class="file-upload" onclick="document.getElementById('file-upload').click()">
+                        <i class="fas fa-cloud-upload-alt fa-3x" style="color: #3498db; margin-bottom: 1rem;"></i>
+                        <h3>Upload Excel File</h3>
+                        <p>Drag and drop or click to upload</p>
+                        <p class="text-muted">Supported format: .xlsx</p>
+                    </div>
+                    <input type="file" id="file-upload" accept=".xlsx">
+                    
+                    <div class="status" id="status"></div>
+                    <div class="loading-spinner" id="loading"></div>
+                    
+                    <div class="duplicates-section" id="duplicates"></div>
+                    
+                    <div class="download-output" id="download-output" style="display: none;">
+                        <button id="download-btn">
+                            <i class="fas fa-download"></i>
+                            Download GeoJSON
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
