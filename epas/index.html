@@ -2,48 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excel to GeoJSON Processor</title>
+    <title>EPAS Data Processor (Client-Side)</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Include SheetJS for Excel processing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script defer src="script.js"></script>
 </head>
 <body>
-    <h1>Excel to GeoJSON Processor</h1>
-    <input type="file" id="fileInput" accept=".xlsx">
-    <div id="results">
-        <p id="errors"></p>
-        <p id="duplicates"></p>
-        <p id="invalidNUTS"></p>
+    <div class="container">
+        <h1>Efrem's EPAS Data Processor</h1>
+        
+        <!-- Download Templates -->
+        <div class="downloads">
+            <button id="download-schools">📥 Schools Template</button>
+            <button id="download-geojson">📥 NUTS GeoJSON</button>
+        </div>
+
+        <!-- File Upload -->
+        <input type="file" id="file-upload" accept=".xlsx">
+        <div id="status"></div>
+
+        <!-- Results -->
+        <div id="duplicates"></div>
+        <div id="download-output" style="display: none;">
+            <button id="download-btn">Download GeoJSON</button>
+        </div>
     </div>
-    <button id="downloadGeoJSON" style="display:none;">Download GeoJSON</button>
-    
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
-        h1 {
-            color: #333;
-        }
-        input {
-            margin: 10px 0;
-        }
-        #results p {
-            color: red;
-        }
-        button {
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            display: inline-block;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-    </style>
+    <script src="script.js"></script>
 </body>
 </html>
